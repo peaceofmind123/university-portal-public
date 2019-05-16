@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <style>
+        .jumbotron{
+            margin-top: 10%;
+        }
+        #buttons{
+            margin-top: 5%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="col-md-8 col-md-push-2">
+            <div class="jumbotron alert alert-danger">
+                <div class="row">
+                    <div class="page-header">
+                        <h1><i class="glyphicon glyphicon-exclamation-sign"></i> Access Denied !</h1>
+                    </div>
+                </div>
+                <div class="row" id="message">
+                    You are not authorized to view this page as a {{ user.profiletype }}. In order to view this page,
+                    you need to be logged in as {{ profile_type }}
+                </div>
+                <div class="row" id="buttons">
+                    <a href="{% url 'datarepo:login' %}" class="btn btn-primary">Login Again</a>
+                    {% if user.profiletype == 'AdminUser' %}
+                        <a href="{% url 'adminapp:index' %}" class="btn btn-success">Back to Home</a>
+                    {% elif user.profiletype == 'TeacherUser' %}
+                        <a href="{% url 'teacherapp:index' %}" class="btn btn-success">Back to Home</a>
+                    {% elif user.profiletype == 'StudentUser' %}
+                        <a href="{% url 'studentapp:index' %}" class="btn btn-success">Back to Home</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

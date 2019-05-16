@@ -1,0 +1,41 @@
+{% extends 'teacherapp/teacherbase.html' %}
+
+{% block extranewcss %}
+{% endblock %}
+
+{% block content %}
+
+        <div class="row">
+             <div class="page-header col-md-12">
+                 <h3>Recent Notifications</h3>
+             </div>
+            <div class="col-md-12">
+                {% if notifications %}
+                <ul class="list-group">
+                    {% for notification in notifications %}
+                        <a {% if notification.redirect_url %}href="{{ redirect_url }}"{% else %}href="#"{% endif %}>
+                            <li class="list-group-item">
+                                <div class="row" style="padding: 2%">
+                                    <div class="col-md-2">
+                                        <span class="badge"><div class="fa fa-edit"></div> {{ notification.category }}</span>
+                                    </div>
+                                    <div class="col-md-8">
+                                        {{ notification.message }}
+                                    </div>
+                                    <div class="col-md-2 pull-right">
+                                        <small><em>{{ notification.created_date.date }}</em></small>
+                                    </div>
+                                </div>
+                            </li>
+                        </a>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                    <div class="alert alert-lg alert-info">
+                        <p> No Recent Notifications </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+{% endblock %}

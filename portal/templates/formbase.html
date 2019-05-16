@@ -1,0 +1,39 @@
+{% load widget_tweaks %}
+<form {% if formID %}id="{{ formID }}"{% else %}id="formbase-form"{% endif %} method="POST" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+            {% for error in form.non_field_errors %}
+                <p {% if forloop.last %}class="mb-0" {% endif %}>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% for field in form %}
+    <div class="form-group">
+        {{ field.label_tag }}
+        {% if form.is_bound %}
+            {% if field.errors %}
+                {% render_field field class='form-control panel-danger' %}
+                {% for error in field.errors %}
+                <div class="text-danger">
+                    {{ error }}
+                </div>
+                {% endfor %}
+            {% else %}
+                {% render_field field class='form-control panel-success' %}
+            {% endif %}
+        {% else %}
+            {% render_field field class='form-control' %}
+        {% endif %}
+        {% if field.help_text %}
+            <span class="text-muted"><small>{{ field.help_text|safe }}</small></span>
+        {% endif %}
+    </div>
+
+    {% endfor %}
+    <button type="submit" class="btn btn-success">Proceed</button>
+    {% if returnURL %}
+        <a href="{% url returnURL %}" class="btn btn-danger">Cancel</a>
+    {% endif %}
+</form>

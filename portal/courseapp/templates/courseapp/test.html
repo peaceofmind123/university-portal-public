@@ -1,0 +1,146 @@
+{% extends 'courseapp/coursebase.html' %}
+{% load static %}
+
+{% block title %}
+    {{ course.name }} - Tests
+{% endblock %}
+
+{% block extracss %}
+    <style>
+        #add-test-button{
+            margin-top: 3%;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+             {% if user.profiletype == 'TeacherUser' %}
+                {% if not error %}
+                    <button type="button" class="btn btn-success pull-right" id="add-test-button" data-toggle="modal" data-target="#addtestModal">
+                        <span class="glyphicon glyphicon-pencil"></span> New Test
+                    </button>
+                    <div class="modal" id="addtestModal">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <a href="{% url 'courseapp:test' course.code %}" class="close">&times</a>
+                                    <div class="modal-title"><h3 class="info">New test</h3></div>
+                                </div>
+                                <div id="formbody" class="modal-body">
+                                    <!-- Django test Creation Form -->
+                                    {% include 'courseapp/classplanform.html' with formID='form-addtest' course=course cancelURL='courseapp:test'%}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+            <h2 class="page-header text-capitalize">Tests</h2>
+        </div>
+    </div>
+
+    <div class="row">
+    {% for test in course.get_tests %}
+        <div class="col-md-4">
+            <div class="panel panel-red ">
+                <div class="panel panel-heading">
+                    <h4>{{ test.name }}</h4>
+                </div>
+                <div class="panel-body">
+                     <div class="card-text">
+                         <p><strong>Chapters in Syllabus: </strong></p>
+                         <ul class="list-group">
+                             {% for chapter in test.chapters_to_study.all %}
+                                <li class="list-group-item">{{ chapter.name }}</li>
+                             {% endfor %}
+                         </ul>
+                     </div>
+                     {% if not user.profiletype == 'TeacherUser' %}
+                         {% if test.results.exists %}
+                             <a href="{% url 'courseapp:result' course.code test.pk %}" class="btn btn-success btn-block">View Results</a>
+                         {% else %}
+                             <div class="alert alert-info">
+                                Results are yet to be published for this test.
+                            </div>
+                         {% endif %}
+                     {% else %}
+                        {% if test.results.exists %}
+                            <div id="morris-donut-chart-{{ test.get_id }}"></div>
+                            <a href="{% url 'courseapp:result' course.code test.pk %}" class="btn btn-success btn-block">View Results</a>
+                        {% else %}
+                            <div class="alert alert-lg alert-info">
+                                Results are yet to be published for this test.
+                            </div>
+                            <a href="{% url 'courseapp:result' course.code test.pk %}" class="btn btn-primary btn-block">Publish Results</a>
+                        {% endif %}
+                     {% endif %}
+                </div>
+                <div class="panel-footer">
+                    <p><strong>Full Marks:  </strong>{{ test.fullmarks }}</p>
+                    <p><strong>Pass Marks:  </strong>{{ test.passmarks }}</p>
+                    <p><strong>Date:  </strong>{{ test.classplan.classdate }}</p>
+                </div>
+            </div>
+        </div>
+    {%  endfor %}
+    {% if error %}
+        <p class="alert alert-danger">
+            <strong>{{ error.code }}</strong>
+            <br>{{ error.message }}
+        </p>
+    {% endif %}
+    </div>
+
+{% endblock content %}
+
+{% if user.profiletype == 'TeacherUser' %}
+    {% block extrajs %}
+        <script>
+            var formbody = document.querySelector('#formbody');
+            var refreshEvent = new Event('refresh');
+
+            $(function () {
+                {% for test in course.get_tests %}
+                    {% if test.results.exists %}
+                        passed = {{ test.get_passed_count }};
+                        failed = {{ test.get_failed_count }};
+
+                        Morris.Donut({
+                            element: 'morris-donut-chart-{{ test.get_id }}',
+                            data: [{
+                                    label:"Passed",
+                                    value:passed
+                                }, {
+                                    label:"Failed",
+                                    value:failed
+                                }],
+                            colors: ['green','brown'],
+                            resize: true
+                        });
+                    {% endif %}
+                {% endfor %}
+
+                formbody.addEventListener('refresh',function (event) {
+                    var form = document.querySelector('#form-addtest');
+                    form.addEventListener('submit',function (e) {
+                        var formdata = new FormData(form);
+                        var req = new XMLHttpRequest();
+                        req.open('POST',"{% url 'courseapp:ajax_addtest' course.code %}",true);
+                        req.addEventListener('load',function (ev) {
+                            formbody.innerHTML = this.responseText;
+                            formbody.dispatchEvent(refreshEvent);
+                        });
+                        req.send(formdata);
+                        e.preventDefault();
+                    });
+                });
+
+                formbody.dispatchEvent(refreshEvent);
+
+            });
+
+        </script>
+    {% endblock %}
+{% endif %}

@@ -1,0 +1,72 @@
+{% extends 'courseapp/coursebase.html' %}
+{% load static %}
+
+{% block title %}
+    {{ course.name }}-Home
+{% endblock %}
+
+{% block extracss %}
+<style>
+    .jumbotron{
+        margin: auto;
+    }
+    a.btn-block {
+        margin-top: 15%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h2 class="page-header text-capitalize">Course Description</h2>
+        </div>
+    </div>
+    <div class="jumbotron">
+    <div class="row" style="margin:auto;">
+        <div class="col-md-4">
+            <img src="{% static course.profilepic.url %}" alt="Course Book Image" width="100%">
+            {% if user.profiletype == 'AdminUser' %}
+                <a href="{% url 'courseapp:editinfo' course.code %}" class="btn btn-block btn-info">
+                    <span class="glyphicon glyphicon-pencil"></span> Edit Details
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="col-md-8">
+            <div class="card" >
+              <ul class="list-group list-group-flush card-body">
+                <li class="list-group-item">
+                    <h4 class="card-title">Course Code</h4>
+                    <p class="card-text">{{ course.code }}</p>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="card-title">Course Name</h4>
+                    <p class="card-text">{{ course.name }}</p>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="card-title">Instructor</h4>
+                    <p class="card-text">{{ course.teacher.get_full_name }}</p>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="card-title">Total Marks</h4>
+                    <p class="card-text">{{ course.totalmarks }}</p>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="card-title">Affiliated Streams</h4>
+                    {% for stream in course.get_streams %}<small class="card-text">{{ stream.stream_id }}</small>, {% endfor %}
+                </li>
+                <li class="list-group-item">
+                    <h4 class="card-title">Total Students</h4>
+                    <p class="card-text">{{ course.get_students_count }}</p>
+                </li>
+              </ul>
+            </div>
+        </div>
+     </div>
+    </div>
+    <!-- #jumbotron-end -->
+{% endblock content %}
+
+{% block extrajs %}
+{% endblock %}

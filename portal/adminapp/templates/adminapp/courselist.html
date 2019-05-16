@@ -1,0 +1,56 @@
+{% extends 'adminapp/adminbase.html' %}
+{% block extracss %}
+    <style>
+        .box {
+            margin-bottom: 20%;
+        }
+        a.box{
+            text-decoration: none;
+            color: #222222;
+        }
+        a.box:hover{
+            text-decoration:none;
+            color: #2a6496;
+        }
+        #addcourse {
+            margin-bottom: 2%;
+            margin-right: 4%;
+        }
+        #taughtlist {
+            padding-left: 1%;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="container col-md-12">
+            <a id="addcourse" href="{% url 'adminapp:addcourse' %}" class="btn btn-success pull-right">
+                <span class="glyphicon glyphicon-pencil"></span> Add Course
+            </a>
+        </div>
+        {%  for course in courses %}
+            <div class="col-md-4">
+                <a class="box" href="{% url 'courseapp:index' course.code %}">
+                    <div class="panel panel-red text-center">
+                        <div class="panel panel-heading">
+                            <h4>{{ course.code }}</h4>
+                        </div>
+                        <div class="panel-body">
+                             <p class="card-text"><big>{{ course.name }}</big></p>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <p id="taughtlist" class="pull-left">Taught in:
+                                    {% for stream in course.get_streams %}
+                                        <strong>{{ stream.stream_id }}</strong>,
+                                    {% endfor %}
+                                </p>
+                                <p></p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {%  endfor %}
+    </div>
+{% endblock %}

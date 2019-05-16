@@ -1,0 +1,108 @@
+{% extends 'adminapp/adminbase.html' %}
+
+{% block extracss %}
+    <style>
+        a.box{
+            text-decoration: none;
+            color: #222222;
+        }
+        a.box:hover{
+            text-decoration:none;
+            color: #2a6496;
+        }
+        #listofcourse{
+            margin-left:2%;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="container col-md-12">
+             <div class="col-md-12">
+                 <h1 class="page-header">{{ stream.stream_id }} <small>{{ stream.name }}</small></h1>
+                 <a class="btn btn-danger pull-right " id="back" href="{% url 'adminapp:streamlist' %}">
+                     <span class="glyphicon glyphicon-circle-arrow-left"></span> Back
+                 </a>
+                 <a class="btn btn-success pull-right" id="back" href="{% url 'adminapp:editstream' stream.stream_id %}">
+                     <span class="glyphicon glyphicon-pencil"></span> Edit Information
+                 </a>
+
+             </div>
+        </div>
+        <h3 id="listofcourse" class="pull-left">List of Courses</h3>
+        <div class="row col-md-12">
+            {%  for course in stream.level1courses.all %}
+                <div class="col-md-4 ">
+                    <a class="box" href="{% url 'courseapp:index' course.code %}">
+                        <div class="panel panel-primary text-center">
+                            <div class="panel panel-heading">
+                                <span>{{ course.code }}</span>
+                                <span class="label pull-right">First Year</span>
+                            </div>
+                            <div class="panel-body">
+                                 <p class="card-text">{{ course.name }}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {%  endfor %}
+        </div>
+
+        <div class="row col-md-12">
+            {%  for course in stream.level2courses.all %}
+                <div class="col-md-4 ">
+                    <a class="box" href="{% url 'courseapp:index' course.code %}">
+                        <div class="panel panel-yellow text-center">
+                            <div class="panel panel-heading">
+                                <span>{{ course.code }}</span>
+                                <span class="label pull-right">Second Year</span>
+                            </div>
+                            <div class="panel-body">
+                                 <p class="card-text">{{ course.name }}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {%  endfor %}
+        </div>
+
+        <div class="row col-md-12">
+            {%  for course in stream.level3courses.all %}
+                <div class="col-md-4 ">
+                    <a class="box" href="{% url 'courseapp:index' course.code %}">
+                        <div class="panel panel-green text-center">
+                            <div class="panel panel-heading">
+                                <span>{{ course.code }}</span>
+                                <span class="label pull-right">Third Year</span>
+                            </div>
+                            <div class="panel-body">
+                                 <p class="card-text">{{ course.name }}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {%  endfor %}
+        </div>
+
+        <div class="row col-md-12">
+            {%  for course in stream.level4courses.all %}
+                <div class="col-md-4 ">
+                    <a class="box" href="{% url 'courseapp:index' course.code %}">
+                        <div class="panel panel-red text-center">
+                            <div class="panel panel-heading">
+                                <span>{{ course.code }}</span>
+                                <span class="label pull-right">Fourth Year</span>
+                            </div>
+                            <div class="panel-body">
+                                 <p class="card-text">{{ course.name }}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {%  endfor %}
+        </div>
+
+    </div>
+
+{% endblock %}

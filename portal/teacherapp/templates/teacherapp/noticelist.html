@@ -1,0 +1,41 @@
+{% extends 'teacherapp/teacherbase.html' %}
+
+{% block extranewcss %}
+{% endblock %}
+
+{% block content %}
+        <div class="row">
+             <div class="page-header col-md-12">
+                 <h3>Recently Published Notices</h3>
+             </div>
+        {%  for notice in notices %}
+            <div class="col-md-12">
+                <div class="panel
+                {% if notice.category == 'Co-curricular' %}
+                    panel-yellow
+                {% elif notice.category == 'Exam' %}
+                    panel-info
+                {% elif notice.category == 'Admission' %}
+                    panel-green
+                {% elif notice.category == 'Holiday' %}
+                    panel-red
+                {% elif notice.category == 'General' %}
+                    panel-primary
+                {% endif %}">
+                    <div class="panel-heading">
+                        <span class="text-left">{{ notice.title }}</span>
+                        <span class="pull-right badge badge-default">{{ notice.category }}</span>
+                    </div>
+                    <div class="panel-body">
+                         <p class="card-text">{{ notice.description }}</p>
+                    </div>
+                    <div class="panel-footer">
+                        <p class="card-text">
+                            <small>{{ notice.published_date }}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {%  endfor %}
+    </div>
+{% endblock %}

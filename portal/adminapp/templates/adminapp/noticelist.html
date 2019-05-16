@@ -1,0 +1,98 @@
+{% extends 'adminapp/adminbase.html' %}
+
+{% block extracss %}
+    <style>
+        #newnotice {
+            margin-top: 1%
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="container col-md-12">
+             <div class="page-header col-md-12">
+                 <button id="add-notice-button" class="btn btn-success pull-right">
+                     <span class="glyphicon glyphicon-pencil"></span> New Notice
+                 </button>
+                 <h3>Recently Published Notices</h3>
+             </div>
+             <div class="modal" id="addNoticeModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <a href="{% url 'adminapp:noticelist' %}" class="close">&times</a>
+                            <div class="modal-title"><h3 class="info">Add New Notice</h3></div>
+                        </div>
+                        <div id="formbody" class="modal-body">
+                            <!-- Django Notice Creation Form -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {%  for notice in notices %}
+            <div class="col-md-12">
+                <div class="panel
+                {% if notice.category == 'Co-curricular' %}
+                    panel-yellow
+                {% elif notice.category == 'Exam' %}
+                    panel-info
+                {% elif notice.category == 'Admission' %}
+                    panel-green
+                {% elif notice.category == 'Holiday' %}
+                    panel-red
+                {% elif notice.category == 'General' %}
+                    panel-primary
+                {% endif %}">
+                    <div class="panel-heading">
+                        <span class="text-left">{{ notice.title }}</span>
+                        <span class="pull-right badge badge-default">{{ notice.category }}</span>
+                    </div>
+                    <div class="panel-body">
+                         <p class="card-text">{{ notice.description }}</p>
+                    </div>
+                    <div class="panel-footer">
+                        <p class="card-text">
+                            <small>{{ notice.published_date }}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {%  endfor %}
+    </div>
+{% endblock %}
+
+{% block extrajs %}
+    <script>
+        var formbody = document.querySelector('#formbody');
+        var addnoticeBtn = document.querySelector('#add-notice-button');
+        var refreshEvent = new Event('refresh');
+
+        formbody.addEventListener('refresh',function (event) {
+            var form = document.querySelector('#form-addnotice');
+            form.addEventListener('submit',function (e) {
+                var formdata = new FormData(form);
+                var req = new XMLHttpRequest();
+                req.open('POST',"{% url 'adminapp:ajax_addnotice' %}",true);
+                req.addEventListener('load',function (ev) {
+                    formbody.innerHTML = this.responseText;
+                    formbody.dispatchEvent(refreshEvent);
+                });
+                req.send(formdata);
+                e.preventDefault();
+            });
+        });
+
+        addnoticeBtn.addEventListener('click',function (event) {
+            var req = new XMLHttpRequest();
+            req.open('GET',"{% url 'adminapp:ajax_addnotice' %}",true);
+            req.addEventListener('load',function (ev) {
+                formbody.innerHTML = this.responseText;
+                formbody.dispatchEvent(refreshEvent);
+                $('#addNoticeModal').modal();   // Looks like this works only with jQuery not with pure JS.
+            });
+            req.send();
+        });
+    </script>
+{% endblock %}

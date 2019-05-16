@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{% endblock %}
+
+{% block extracss %}
+{% endblock %}
+
+{% block navHeader %}
+    {{ course.name }}
+{% endblock %}
+
+{% block navUsername %}
+    {{ user.username }}
+    {% if user.profiletype == 'AdminUser' %}
+        <span class="glyphicon glyphicon-star"></span>
+    {% endif %}
+{% endblock %}
+
+{% block sidebarList %}
+    <ul class="nav" id="side-menu">
+
+        <li>
+            <a href="{% url  'courseapp:index' course.code %}"><i class="fa fa-home fa-fw"></i> Course Home</a>
+        </li>
+        <li>
+            <a href="{% url  'courseapp:syllabus' course.code %}"><i class="fa fa-dashboard fa-fw"></i> Syllabus</a>
+        </li>
+        <li>
+            <a href="{% url  'courseapp:courseplan' course.code %}"><i class="fa fa-table fa-fw"></i> Courseplan</a>
+        </li>
+        <li>
+            <a href="{% url  'courseapp:assignment' course.code %}"><i class="fa fa-edit fa-fw"></i> Assignments</a>
+        </li>
+        <li>
+            <a href="{% url  'courseapp:handout' course.code %}"><i class="fa fa-wrench fa-fw"></i> Handouts</a>
+        </li>
+        <li>
+            <a href="{% url  'courseapp:test' course.code %}"><i class="fa fa-sitemap fa-fw"></i> Tests</a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+{% endblock content %}
+
+{% block extrajs %}
+{% endblock %}

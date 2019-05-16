@@ -1,0 +1,70 @@
+{% extends 'adminapp/adminbase.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block extracss %}
+    <style>
+        form ul{
+            list-style-type: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="container col-md-12 ">
+             <div class="page-header col-md-12">
+                 <h3>New Stream Creation</h3>
+             </div>
+        </div>
+        <div class="col-md-12">
+            <p class="text-muted">Enter the following information to create a new stream to be managed through the portal.
+               You can edit the information after creation as well.
+            </p>
+        </div>
+        <div class="jumbotron col-md-12">
+            <form method="POST" novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p {% if forloop.last %}class="mb-0" {% endif %}>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="form-group">
+                        {{ field.label_tag}}
+                        {% if field.label == 'Courses taught in 1st year' %}
+                            {% render_field field %}
+                        {% elif field.label == 'Courses taught in 2nd year' %}
+                            {% render_field field %}
+                        {% elif field.label == 'Courses taught in 3rd year' %}
+                            {% render_field field %}
+                        {% elif field.label == 'Courses taught in 4th year' %}
+                            {% render_field field %}
+                        {% else %}
+                            {% if form.is_bound %}
+                                {% if field.errors %}
+                                    {% render_field field class='form-control panel-danger' %}
+                                    {% for error in field.errors %}
+                                    <div class="text-danger">
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    {% render_field field class='form-control panel-success' %}
+                                {% endif %}
+                            {% else %}
+                                {% render_field field class='form-control' %}
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-success">Proceed</button>
+                <a href="{% url 'adminapp:streamlist' %}" class="btn btn-danger">Cancel</a>
+            </form>
+        </div>
+    </div>
+{% endblock %}

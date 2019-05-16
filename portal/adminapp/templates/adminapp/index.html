@@ -1,0 +1,148 @@
+{% extends 'adminapp/adminbase.html' %}
+
+{% block title %}
+    Index-{{ user.username }}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-dashboard fa-5x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge">{{ streams|length }}</div>
+                                <div>Streams</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{% url 'adminapp:streamlist' %}">
+                        <div class="panel-footer">
+                            <span class="pull-left">View Details</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-green">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-book fa-5x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge">{{ courses|length }}</div>
+                                <div>Courses</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{% url 'adminapp:courselist' %}">
+                        <div class="panel-footer">
+                            <span class="pull-left">View Details</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-yellow">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-users fa-5x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge">{{ students|length }}</div>
+                                <div>Students</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{% url 'adminapp:studentlist' %}">
+                        <div class="panel-footer">
+                            <span class="pull-left">View Details</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-red">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-user fa-5x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge">{{ teachers|length }}</div>
+                                <div>Teachers</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{% url 'adminapp:teacherlist' %}">
+                        <div class="panel-footer">
+                            <span class="pull-left">View Details</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    <div class="row">
+    <div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<i class="fa fa-bar-chart-o fa-fw"></i> Student distribution across different batches
+            </div>
+			<div class="panel-body">
+				<div id="morris-line-chart"></div>
+			</div>
+        </div>
+        <div class="panel panel-default">
+			<div class="panel-heading">
+				<i class="fa fa-bar-chart-o fa-fw"></i> Average marks of different batches on final board exam
+			</div>
+			<div class="panel-body">
+				<div id="morris-bar-chart"></div>
+			</div>
+		</div>
+    </div>
+    </div>
+{% endblock %}
+
+{% block extrajs %}
+     <script>
+	$(function() {
+        Morris.Line({
+            element: 'morris-line-chart',
+            data: {{ barchart.data|safe }},
+            xkey: 'y',
+            ykeys: {{ barchart.label.ykeys|safe }},
+            labels: {{ barchart.label.labels|safe }},
+            hideHover: 'auto',
+            resize: true
+        });
+
+        Morris.Bar({
+              element: 'morris-bar-chart',
+              data: [
+                { y: '2071', a: 84,  b: 81, c: 84 , d: 79},
+                { y: '2072', a: 87,  b: 82, c: 75, d: 77},
+                { y: '2073', a: 83,  b: 79, c: 80 , d: 70},
+                { y: '2074', a: 82,  b: 74, c: 79, d: 70}
+              ],
+              xkey: 'y',
+              ykeys: ['a', 'b','c','d'],
+              labels: ['BCT', 'BEX','BEL','BCE'],
+              ymin :50
+        });
+    });
+</script>
+{% endblock %}

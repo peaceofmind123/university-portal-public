@@ -1,0 +1,14 @@
+.wrapper {
+    margin-top: 0px;
+    margin-bottom: 80px;
+    opacity: 0.9;
+}
+
+#form-signin {
+
+  padding: 15px 35px 45px;
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+

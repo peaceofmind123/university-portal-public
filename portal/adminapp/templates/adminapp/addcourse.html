@@ -1,0 +1,87 @@
+{% extends 'adminapp/adminbase.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header text-capitalize">New Course Addition</h2>
+        </div>
+    </div>
+    <div class="jumbotron" style="margin: auto;">
+        <form enctype="multipart/form-data" method="POST" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.non_field_errors %}
+                        <p {% if forloop.last %}class="mb-0" {% endif %}>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="row" style="margin:auto;">
+
+                <div class="col-md-4">
+                    <img src="" class="profilepicture" width="100%">
+                    {{ form.profilepic.label_tag }}
+                    {% if form.is_bound %}
+                        {% if form.profilepic.errors %}
+                            {% render_field form.profilepic class='form-control panel-danger' %}
+                            {% for error in form.profilepic.errors %}
+                            <div class="text-danger">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            {% render_field form.profilepic class='form-control panel-success' %}
+                        {% endif %}
+                    {% else %}
+                        {% render_field form.profilepic class='form-control' %}
+                    {% endif %}
+                    <span class="text-muted"><small>{{ form.profilepic.help_text }}</small></span>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="card" >
+                      <ul class="list-group list-group-flush card-body">
+                        {% for field in form %}
+                            {% if not field.name == 'profilepic' %}
+                                <li class="list-group-item form-group">
+                                    {{ field.label_tag }}
+                                    {% if form.is_bound %}
+                                        {% if field.errors %}
+                                            {% render_field field class='form-control panel-danger' %}
+                                            {% for error in field.errors %}
+                                            <div class="text-danger">
+                                                {{ error }}
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            {% render_field field class='form-control panel-success' %}
+                                        {% endif %}
+                                    {% else %}
+                                        {% render_field field class='form-control' %}
+                                    {% endif %}
+                                    {% if field.help_text %}
+                                        <span class="text-muted"><small>{{ field.help_text }}</small></span>
+                                    {% endif %}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                      </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin: auto;">
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-success btn-block">Proceed</button>
+                    <a href="{% url 'adminapp:courselist' %}" class="btn btn-danger btn-block">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- #jumbotron-end -->
+{% endblock %}
+{% block extrajs %}
+    <script src="{% static 'js/imagePreviewer.js' %}"></script>
+{% endblock %}

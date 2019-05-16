@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extracss %}
+{% endblock %}
+
+{% block navHeader %}
+    Administrator
+{% endblock %}
+
+{% block navUsername %}
+    {{ user.username }}
+    {% if user.profiletype == 'AdminUser' %}
+        <span class="glyphicon glyphicon-star "></span>
+    {% endif %}
+{% endblock %}
+
+{% block sidebarList %}
+    <ul class="nav" id="side-menu">
+        <li>
+            <a href="{% url 'adminapp:index' %}"><i class="fa fa-dashboard fa-fw"></i> Overview</a>
+        </li>
+        <li>
+            <a href="{% url 'adminapp:streamlist' %}"><i class="fa fa-bar-chart-o fa-fw"></i> Streams</a>
+        </li>
+        <li>
+            <a href="{% url 'adminapp:courselist' %}"><i class="fa fa-table fa-fw"></i> Courses</a>
+        </li>
+        <li>
+            <a href="{% url 'adminapp:studentlist' %}"><i class="fa fa-edit fa-fw"></i> Students</a>
+        </li>
+        <li>
+            <a href="{% url 'adminapp:addbatch' %}"><i class="fa fa-edit fa-fw"></i> New Admission</a>
+        </li>
+        <li>
+            <a href="{% url 'adminapp:teacherlist' %}"><i class="fa fa-wrench fa-fw"></i> Teachers</a>
+        </li>
+        <li>
+            <a href="{% url 'adminapp:profileanalysis' %}"><i class="fa fa-bar-chart fa-fw"></i> Profile Analysis</a>
+        </li>
+        <li>
+            <a href="{% url 'adminapp:noticelist' %}"><i class="fa fa-sitemap fa-fw"></i> Notice</a>
+        </li>
+    </ul>
+{% endblock %}
+
+
+{% block extrajs %}
+{% endblock %}

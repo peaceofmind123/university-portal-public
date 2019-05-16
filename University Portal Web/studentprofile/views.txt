@@ -1,0 +1,10 @@
+@login_required(login_url='/login/')
+def profile(request):
+    if request.method == 'POST':
+        formdata = request.POST
+        rollnumber = formdata['rollno']
+        student = accounts.StudentUser.objects.get(rollno = rollnumber)
+    else:
+        student = accounts.StudentUser.objects.get(rollno = '2072BCT501' )
+
+    return render(request, 'adminapp/studentprofile.html', {'student': student})

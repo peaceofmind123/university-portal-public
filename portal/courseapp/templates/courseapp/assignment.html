@@ -1,0 +1,193 @@
+{% extends 'courseapp/coursebase.html' %}
+{% load static %}
+
+{% block title %}
+    {{ course.name }} - Assignment
+{% endblock %}
+
+{% block extracss %}
+    <style>
+        #add-assignment-button{
+            margin-top: 3%;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+             {% if user.profiletype == 'TeacherUser' %}
+                {% if not error %}
+                    <button type="button" class="btn btn-success pull-right" id="add-assignment-button" data-toggle="modal" data-target="#addAssignmentModal">
+                        <span class="glyphicon glyphicon-pencil"></span> New Assignment
+                    </button>
+                    <div class="modal" id="addAssignmentModal">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <a href="{% url 'courseapp:assignment' course.code %}" class="close">&times</a>
+                                    <div class="modal-title"><h3 class="info">New Assignment</h3></div>
+                                </div>
+                                <div id="formbody" class="modal-body">
+                                    <!-- Django Assignment Creation Form -->
+                                    {% include 'courseapp/classplanform.html' with formID='form-addassignment' course=course cancelURL='courseapp:assignment'%}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+             {% elif user.profiletype == 'StudentUser' %}
+                <div class="modal" id="addSubmissionModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <a href="{% url 'courseapp:assignment' course.code %}" class="close">&times</a>
+                                <div class="modal-title"><h3 class="info">Submit Assignment</h3></div>
+                            </div>
+                            <div id="submissionbody" class="modal-body">
+                                <!-- Django Submission Form -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             {% endif %}
+            <h2 class="page-header text-capitalize">Assignments</h2>
+        </div>
+    </div>
+
+    <div class="row">
+    {% for assignment in course.get_assignments %}
+        <div class="col-md-4">
+            <div class="panel panel-primary text-center">
+                <div class="panel panel-heading">
+                    <h4>{{ assignment.name }}</h4>
+                </div>
+                <div class="panel-body">
+                     <p class="card-text"><strong>Description: </strong>{{ assignment.description }}</p>
+                     {% if user.profiletype == 'StudentUser' %}
+                         {% if assignment.question_file %}
+                             <a href="{% static assignment.question_file.url %}" target="_blank" class="btn btn-danger">Get Question</a>
+                         {% else %}
+                             <p><em>No attached question files</em></p>
+                         {% endif %}
+                         <button class="add-submission-button btn btn-success" data-assignid="{{ assignment.pk }}" >
+                             {% if not assignment in submitted_assignments %}
+                                Submit Assignment
+                             {% else %}
+                                Change Submission
+                             {% endif %}
+                         </button>
+                     {% else %}
+                        <div id="morris-donut-chart-{{ assignment.pk }}"></div>
+                        {% if assignment.question_file %}
+                             <a href="{% static assignment.question_file.url %}" target="_blank" class="btn btn-success">Show Question</a>
+                        {% endif %}
+                        <a href="{% url 'courseapp:submission' course.code assignment.pk %}" class="btn btn-primary">View Submissions {{ assignment.questionfile }}</a>
+                     {% endif %}
+                </div>
+                <div class="panel-footer">
+                    <p>Published Date: {{ assignment.published_date }}</p>
+                    <p>Submission Deadline : {{ assignment.submission_deadline }} </p>
+                </div>
+            </div>
+        </div>
+    {%  endfor %}
+    {% if error %}
+        <p class="alert alert-danger">
+            <strong>{{ error.code }}</strong>
+            <br>{{ error.message }}
+        </p>
+    {% endif %}
+    </div>
+
+{% endblock content %}
+
+{% if user.profiletype == 'TeacherUser' %}
+    {% block extrajs %}
+        <script>
+            var formbody = document.querySelector('#formbody');
+            var submissionbody = document.querySelector('#submissionbody');
+            var submitBtns = document.querySelectorAll('.add-submission-button');
+            var refreshEvent = new Event('refresh');
+            var assignID;
+
+            $(function () {
+                {% if not user.profiletype == 'StudentUser' %}
+
+                    {% for assignment in course.get_assignments %}
+                        submitted = {{ assignment.submissions.count }};
+                        not_submitted = {{ assignment.classplan.course.get_students_count }}-submitted;
+
+                        Morris.Donut({
+                            element: 'morris-donut-chart-{{ assignment.pk }}',
+                            data: [{
+                                    label:"Submitted",
+                                    value:submitted
+                                }, {
+                                    label:"Not Submitted",
+                                    value:not_submitted
+                                }],
+                            colors: ['green','brown'],
+                            resize: true
+                        });
+                    {% endfor %}
+
+                    {% if user.profiletype == 'TeacherUser' %}
+                    formbody.addEventListener('refresh',function (event) {
+                        var form = document.querySelector('#form-addassignment');
+                        form.addEventListener('submit',function (e) {
+                            var formdata = new FormData(form);
+                            var req = new XMLHttpRequest();
+                            req.open('POST',"{% url 'courseapp:ajax_addassignment' course.code %}",true);
+                            req.addEventListener('load',function (ev) {
+                                formbody.innerHTML = this.responseText;
+                                formbody.dispatchEvent(refreshEvent);
+                            });
+                            req.send(formdata);
+                            e.preventDefault();
+                        });
+                    });
+
+                    formbody.dispatchEvent(refreshEvent);
+                    {% endif %}
+
+                {% else %}
+
+                    submissionbody.addEventListener('refresh',function (event) {
+                        var form = document.querySelector('#form-addsubmission');
+                        form.addEventListener('submit',function (e) {
+                            var formdata = new FormData(form);
+                            var req = new XMLHttpRequest();
+                            req.open('POST',"{% url 'courseapp:ajax_addsubmission' course.code %}",true);
+                            req.setRequestHeader('assignID',assignID);
+                            req.addEventListener('load',function (ev) {
+                                submissionbody.innerHTML = this.responseText;
+                                submissionbody.dispatchEvent(refreshEvent);
+                            });
+                            req.send(formdata);
+                            e.preventDefault();
+                        });
+                    });
+
+                    submitBtns.forEach(function (submitBtn) {
+                        submitBtn.addEventListener('click',function (event) {
+                            var origin = event.target;
+                            assignID = origin.getAttribute('data-assignid');
+                            var req = new XMLHttpRequest();
+                            req.open('GET',"{% url 'courseapp:ajax_addsubmission' course.code %}",true);
+                            req.setRequestHeader('assignID',assignID);
+                            req.addEventListener('load',function (ev) {
+                                submissionbody.innerHTML = this.responseText;
+                                submissionbody.dispatchEvent(refreshEvent);
+                                $('#addSubmissionModal').modal();   // Looks like this works only with jQuery not with pure JS.
+                            });
+                            req.send();
+                        });
+                    });
+
+                {% endif %}
+            });
+
+        </script>
+    {% endblock %}
+{% endif %}

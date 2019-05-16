@@ -1,0 +1,45 @@
+{% extends 'adminapp/adminbase.html' %}
+{% block extracss %}
+    <style>
+        a.box{
+            text-decoration: none;
+            color: #222222;
+        }
+        a.box:hover{
+            text-decoration:none;
+            color: #2a6496;
+        }
+        #addstream {
+            margin-bottom: 2%;
+            margin-right: 4%;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <a id="addstream" href="{% url 'adminapp:addstream' %}" class="btn btn-success pull-right">
+                <span class="glyphicon glyphicon-pencil"></span> Add Stream
+            </a>
+        </div>
+        {%  for stream in streams %}
+            <div class="col-md-4">
+                <a class="box" href="{% url 'adminapp:streaminfo' stream.stream_id %}">
+                    <div class="panel panel-primary text-center">
+                        <div class="panel panel-heading">
+                            <h4>{{ stream.stream_id }}</h4>
+                        </div>
+                        <div class="panel-body">
+                             <p class="card-text"><big>{{ stream.name }}</big></p>
+                        </div>
+                        <div class="panel-footer">
+                            <p class="pull-left"><strong>Duration:</strong> {{ stream.duration_years }} years</p>
+                            <p class="pull-right"><strong>{{ stream.students.count }}</strong> students enrolled  </p>
+                            <p></p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {%  endfor %}
+    </div>
+{% endblock %}

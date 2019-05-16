@@ -1,0 +1,17 @@
+$(function() {
+
+	Morris.Line({
+  element: 'morris-line-chart',
+  data: [
+    { y: '2018 W1', a: 48,  b: 48 },
+    { y: '2018 W2', a: 42,  b: 44 },
+    { y: '2018 W3', a: 35,  b: 30 },
+    { y: '2018 W4', a: 27,  b: 38 },
+    { y: '2018 W5', a: 32,  b: 42 },
+  ],
+  xkey: 'y',
+  ykeys: ['a', 'b'],
+  labels: ['DSA', 'COA'],
+	});
+    
+});

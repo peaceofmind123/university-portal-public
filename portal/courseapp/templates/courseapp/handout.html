@@ -1,0 +1,95 @@
+{% extends 'courseapp/coursebase.html' %}
+{% load static %}
+
+{% block title %}
+    {{ course.name }} - Handouts
+{% endblock %}
+
+{% block extracss %}
+    <style>
+        #add-handout-button{
+            margin-top: 3%;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            {% if user.profiletype == 'TeacherUser' %}
+                {% if not error %}
+                <button type="button" class="btn btn-success pull-right" id="add-handout-button" data-toggle="modal" data-target="#addHandoutModal">
+                    <span class="glyphicon glyphicon-pencil"></span> New Handout
+                </button>
+                <div class="modal" id="addHandoutModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <a href="{% url 'courseapp:handout' course.code %}" class="close" >&times</a>
+                                <div class="modal-title"><h3 class="info">Add Handout</h3></div>
+                            </div>
+                            <div id="formbody" class="modal-body">
+                                <!-- Django Handout Creation Form -->
+                                {% include 'courseapp/classplanform.html' with formID='form-addhandout' course=course cancelURL='courseapp:handout'%}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endif %}
+            <h2 class="page-header text-capitalize">Handouts</h2>
+        </div>
+    </div>
+
+    <div class="row">
+    {%  for handout in course.get_handouts %}
+        <div class="col-md-4">
+            <div class="panel panel-primary text-center">
+                <div class="panel panel-heading">
+                    <h4>{{ handout.name }}</h4>
+                </div>
+                <div class="panel-body">
+                     <p class="card-text">{{ handout.description }}</p>
+                     <a href="{% static handout.attached_file.url %}" target="_blank" class="btn btn-success">Get File</a>
+                </div>
+                <div class="panel-footer">
+                    <p>Published Date: {{ handout.published_date }}</p>
+                </div>
+            </div>
+        </div>
+    {%  endfor %}
+    {% if error %}
+        <p class="alert alert-danger">
+            <strong>{{ error.code }}</strong>
+            <br>{{ error.message }}
+        </p>
+    {% endif %}
+    </div>
+{% endblock content %}
+
+{% block extrajs %}
+    {% if user.profiletype == 'TeacherUser' %}
+        <script>
+            var formbody = document.querySelector('#formbody');
+            var refreshEvent = new Event('refresh');
+
+            formbody.addEventListener('refresh',function (event) {
+                var form = document.querySelector('#form-addhandout');
+                form.addEventListener('submit',function (e) {
+                    var formdata = new FormData(form);
+                    var req = new XMLHttpRequest();
+                    req.open('POST',"{% url 'courseapp:ajax_addhandout' course.code %}",true);
+                    req.addEventListener('load',function (ev) {
+                        formbody.innerHTML = this.responseText;
+                        formbody.dispatchEvent(refreshEvent);
+                    });
+                    req.send(formdata);
+                    e.preventDefault();
+                });
+            });
+
+            formbody.dispatchEvent(refreshEvent);
+
+        </script>
+    {% endif %}
+{% endblock %}

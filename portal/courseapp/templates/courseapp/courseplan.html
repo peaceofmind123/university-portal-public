@@ -1,0 +1,462 @@
+{% extends 'courseapp/coursebase.html' %}
+{% load static %}
+
+{% block title %}
+    {{ course.name }} - Course Plan
+{% endblock %}
+
+{% block extracss %}
+    <style>
+        a#createcourseplan{
+            margin-top: 3%;
+        }
+
+    a.add-assignment-button {
+        text-decoration: none;
+        color: darkslategrey;
+    }
+    a.add-handout-button {
+        text-decoration: none;
+        color: darkslategrey;
+    }
+    a.add-test-button {
+        text-decoration: none;
+        color: darkslategrey;
+    }
+    .timeline-heading{
+        margin-bottom: 3%;
+    }
+
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header text-capitalize">Class Activity Plan</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <ul class="timeline">
+                {% for classplan in course.classplans.all %}
+                    <li {% if forloop.counter|divisibleby:2 %}class="timeline-inverted"{% endif %} id="{{ classplan.get_id }}">
+                        <div class="timeline-badge danger">
+                            <h4>Class {{ forloop.counter }}</h4>
+                        </div>
+                        <div class="timeline-panel">
+                            <div class="timeline-heading">
+                                <span class="timeline-title "><strong>Class Date: {{ classplan.classdate }}</strong></span>
+                            </div>
+                            <div class="timeline-body">
+                                <div class="row">
+                                    {% if classplan.chapter %}
+                                            <div class="col-md-12">
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading">
+                                                        Chapter Covered
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <strong>{{ classplan.chapter.name }}</strong>
+                                                        <p>{{ classplan.chapter.description }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    {% else %}
+                                        <p class="alert alert-info"> The class activity does not include the study of any chapters. </p>
+                                    {% endif %}
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="panel panel-yellow">
+                                            <div class="panel-heading">
+                                                Assignment
+                                                {% if user.profiletype == 'TeacherUser' %}
+                                                    <a href="#" data-classid="{{ classplan.get_id }}" class="add-assignment-button pull-right">
+                                                        <i data-classid="{{ classplan.get_id }}" class="add-assignment-button fa fa-plus-square fa-2x"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                            <div class="panel-body">
+                                                {% if classplan.assignment %}
+                                                    <a href="{% url 'courseapp:assignment' course.code %}" style="text-decoration: none;">
+                                                        <strong>{{ classplan.assignment.name }}</strong>
+                                                        <p><small>Submission Deadline: {{ classplan.assignment.submission_deadline }}</small></p>
+                                                    </a>
+                                                {% else %}
+                                                    <p class="alert alert-info">
+                                                        No assignment has been given to this class
+                                                    </p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="panel panel-green">
+                                            <div class="panel-heading">
+                                                Handout
+                                                {% if user.profiletype == 'TeacherUser' %}
+                                                    <a href="#" data-classid="{{ classplan.get_id }}" class="add-handout-button classplan-editor pull-right">
+                                                        <i data-classid="{{ classplan.get_id }}" class="add-handout-button fa fa-plus-square fa-2x"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                            <div class="panel-body">
+                                                {% if classplan.handout %}
+                                                    <a href="{% url 'courseapp:handout' course.code %}" style="text-decoration: none;">
+                                                        <strong>{{ classplan.handout.name }}</strong>
+                                                        <p><small>Published Date: {{ classplan.handout.published_date }}</small></p>
+                                                    </a>
+                                                {% else %}
+                                                    <p class="alert alert-info">
+                                                        No handout has been provided for this class
+                                                    </p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="panel panel-red">
+                                            <div class="panel-heading">
+                                                Test
+                                                {% if user.profiletype == 'TeacherUser' and not classplan.is_completed %}
+                                                    <a href="#" data-classid="{{ classplan.get_id }}" class="add-test-button classplan-editor pull-right">
+                                                        <i data-classid="{{ classplan.get_id }}" class="add-test-button fa fa-plus-square fa-2x"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                            <div class="panel-body">
+                                                {% if classplan.test %}
+                                                    <a href="{% url 'courseapp:test' course.code %}" style="text-decoration: none;">
+                                                        <strong>{{ classplan.test.name }}</strong>
+                                                        <p><small>Full marks: {{ classplan.test.fullmarks }}</small></p>
+                                                    </a>
+                                                {% else %}
+                                                    <p class="alert alert-info">
+                                                        No test on this class day.
+                                                    </p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                {% if user.profiletype == 'TeacherUser'%}
+                                    <button data-classid="{{ classplan.get_id }}" class="btn btn-success btn-block change-classplan-button" >Change Class Plan</button>
+                                    <button data-classid="{{ classplan.get_id }}" class="btn btn-danger btn-block cancel-classplan-button" >Cancel Class on this Day</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+                {% if user.profiletype == 'TeacherUser' %}
+                    <li {% if course.classplans.count|divisibleby:2 %}class=""{% else %}class="timeline-inverted"{% endif %}>
+                        <div class="timeline-badge danger">
+                        </div>
+                        <div class="timeline-panel">
+                            <div class="timeline-body">
+                                <div class="row" style="padding-left: 45%">
+                                    <a href="#" id="create-classplan-button"><i class="fa fa-plus-square fa-5x"></i> </a>
+                                </div>
+                                <div class="row" style="padding-left: 40%">
+                                    <h3>Add Class</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                {% endif %}
+            </ul>
+            {% if not error %}
+                {% if not course.classplans.exists %}
+                    {% if user.profiletype == 'TeacherUser' %}
+                        <p class="alert alert-danger">
+                            You have not yet assigned a class activity plan for this course. Please do it soon !
+                        </p>
+                    {% else %}
+                        <p class="alert alert-danger">
+                            The class activity plan will be assigned by the teacher assigned for this course !
+                        </p>
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                <p class="alert alert-danger">
+                    <strong>{{ error.code }}</strong>
+                    <br>{{ error.message }}
+                </p>
+            {% endif %}
+            <div class="row">
+            </div>
+            {% if user.profiletype == 'TeacherUser' %}
+            <!-- Classplan creation,editing and cancellation + Assignment + Handout + Test modal -->
+                <div class="modal" id="genericModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <a class="close" href="{% url 'courseapp:courseplan' course.code %}">&times</a>
+                                <div class="modal-title"><h3 id="heading-of-modal" class="info"></h3></div>
+                            </div>
+                            <div id="formbody" class="modal-body">
+                                <!-- Django Classplan Creation Form / Classplan Edit Form / Classplan Cancel Info / Assignment Form / Handout Form / Test Form -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}
+
+{% block extrajs %}
+    <script>
+    //script to submit the chapter creation form asynchronously and also to disable options other than current course in select field
+        var formbody = document.querySelector('#formbody');
+        var modalheading = document.querySelector('#heading-of-modal');
+
+        var createBtn = document.querySelector('#create-classplan-button');
+        var changeBtns = document.querySelectorAll('.change-classplan-button');
+        var cancelBtns = document.querySelectorAll('.cancel-classplan-button');
+        var addassBtns = document.querySelectorAll('.add-assignment-button');
+        var addhandBtns = document.querySelectorAll('.add-handout-button');
+        var addtestBtns = document.querySelectorAll('.add-test-button');
+
+        var classCreationEvent = new Event('createClass');
+        var classEditEvent = new Event('editClass');
+        var classCancelEvent = new Event('cancelClass');
+        var assignmentCreationEvent = new Event('createAssignment');
+        var handoutCreationEvent = new Event('createHandout');
+        var testCreationEvent = new Event('createTest');
+
+        var edit_classID;
+        var cancel_classID;
+        var ass_classID;
+        var hand_classID;
+        var test_classID;
+
+        formbody.addEventListener('createClass',function (event) {
+            var form = document.querySelector('#form-createclassplan');
+            form.addEventListener('submit',function (e) {
+                var formdata = new FormData(form);
+                var req = new XMLHttpRequest();
+                req.open('POST',"{% url 'courseapp:ajax_addclass' course.code %}",true);
+                req.addEventListener('load',function (ev) {
+                    formbody.innerHTML = this.responseText;
+                    formbody.dispatchEvent(classCreationEvent);
+                });
+                req.send(formdata);
+                e.preventDefault();
+            });
+        });
+
+        formbody.addEventListener('editClass',function (event) {
+            var form = document.querySelector('#form-editclassplan');
+            form.addEventListener('submit',function (e) {
+                var formdata = new FormData(form);
+                var req = new XMLHttpRequest();
+                req.open('POST',"{% url 'courseapp:ajax_editclass' course.code %}",true);
+                req.setRequestHeader('classID',edit_classID);
+                req.addEventListener('load',function (ev) {
+                    formbody.innerHTML = this.responseText;
+                    formbody.dispatchEvent(classEditEvent);
+                });
+                req.send(formdata);
+                e.preventDefault();
+            });
+        });
+
+        formbody.addEventListener('cancelClass',function (event) {
+            var confirmCancel = document.querySelector('#confirm-cancel');
+            confirmCancel.addEventListener('click',function (ev) {
+                var req = new XMLHttpRequest();
+                req.open('GET',"{% url 'courseapp:ajax_cancelclass' course.code %}",true);
+                req.setRequestHeader('classID',cancel_classID);
+                req.addEventListener('load',function (ev2) {
+                    formbody.innerHTML = this.responseText;
+                });
+                req.send();
+            });
+        });
+
+        formbody.addEventListener('createAssignment',function (event) {
+            var classSelect = document.querySelector('#id_classplan');
+            classSelect.childNodes.forEach(function (option) {
+                if(option.tagName === 'OPTION'){
+                    if(!option.selected){
+                        option.setAttribute('disabled','disabled');
+                    }
+                }
+            });
+            var form = document.querySelector('#form-addassignment');
+            form.addEventListener('submit',function (e) {
+                var formdata = new FormData(form);
+                var req = new XMLHttpRequest();
+                req.open('POST',"{% url 'courseapp:ajax_addassignment' course.code %}",true);
+                req.setRequestHeader('classID',ass_classID);
+                req.addEventListener('load',function (ev) {
+                    formbody.innerHTML = this.responseText;
+                    formbody.dispatchEvent(assignmentCreationEvent);
+                });
+                req.send(formdata);
+                e.preventDefault();
+            });
+        });
+
+        formbody.addEventListener('createHandout',function (event) {
+            var classSelect = document.querySelector('#id_classplan');
+            classSelect.childNodes.forEach(function (option) {
+                if(option.tagName === 'OPTION'){
+                    if(!option.selected){
+                        option.setAttribute('disabled','disabled');
+                    }
+                }
+            });
+            var form = document.querySelector('#form-addhandout');
+            form.addEventListener('submit',function (e) {
+                var formdata = new FormData(form);
+                var req = new XMLHttpRequest();
+                req.open('POST',"{% url 'courseapp:ajax_addhandout' course.code %}",true);
+                req.setRequestHeader('classID',hand_classID);
+                req.addEventListener('load',function (ev) {
+                    formbody.innerHTML = this.responseText;
+                    formbody.dispatchEvent(handoutCreationEvent);
+                });
+                req.send(formdata);
+                e.preventDefault();
+            });
+        });
+
+        formbody.addEventListener('createTest',function (event) {
+            var classSelect = document.querySelector('#id_classplan');
+            classSelect.childNodes.forEach(function (option) {
+                if(option.tagName === 'OPTION'){
+                    if(!option.selected){
+                        option.setAttribute('disabled','disabled');
+                    }
+                }
+            });
+            var form = document.querySelector('#form-addtest');
+            form.addEventListener('submit',function (e) {
+                var formdata = new FormData(form);
+                var req = new XMLHttpRequest();
+                req.open('POST',"{% url 'courseapp:ajax_addtest' course.code %}",true);
+                req.setRequestHeader('classID',test_classID);
+                req.addEventListener('load',function (ev) {
+                    formbody.innerHTML = this.responseText;
+                    formbody.dispatchEvent(testCreationEvent);
+                });
+                req.send(formdata);
+                e.preventDefault();
+            });
+        });
+
+        createBtn.addEventListener('click',function (event) {
+            event.preventDefault();
+            var req = new XMLHttpRequest();
+            req.open('GET',"{% url 'courseapp:ajax_addclass' course.code %}",true);
+            req.addEventListener('load',function (ev) {
+                modalheading.innerHTML = 'New Class';
+                formbody.innerHTML = this.responseText;
+                formbody.dispatchEvent(classCreationEvent);
+                $('#genericModal').modal();   // Looks like this works only with jQuery not with pure JS.
+            });
+            req.send();
+        });
+
+        changeBtns.forEach(function (changeBtn) {
+            changeBtn.addEventListener('click',function (event) {
+                var origin = event.target;
+                edit_classID = origin.getAttribute('data-classid');
+                var req = new XMLHttpRequest();
+                req.open('GET',"{% url 'courseapp:ajax_editclass' course.code %}",true);
+                req.setRequestHeader('classID',edit_classID);
+                req.addEventListener('load',function (ev) {
+                    modalheading.innerHTML = 'Edit Class';
+                    formbody.innerHTML = this.responseText;
+                    formbody.dispatchEvent(classEditEvent);
+                    $('#genericModal').modal();   // Looks like this works only with jQuery not with pure JS.
+                });
+                req.send();
+            });
+        });
+
+        cancelBtns.forEach(function (cancelBtn) {
+            cancelBtn.addEventListener('click',function (event) {
+                var origin = event.target;
+                cancel_classID = origin.getAttribute('data-classid');
+                modalheading.innerHTML = 'Cancel Class';
+                formbody.innerHTML = "<div class=\"row alert alert-danger\" style=\"padding:5%;\" role=\"alert\">\n" +
+                    "    <p ><strong>Alert: </strong>\n" +
+                    "        You are about to cancel the class on this class day. All the activities concerned\n" +
+                    "        with this class will be shifted to the next available class date and so forth. The\n" +
+                    "        final class will then be rescheduled to 1 week after its designated class date.\n" +
+                    "    </p>\n" +
+                    "</div>\n" +
+                    "<div class=\"row\" style=\"padding:5%\">\n" +
+                    "    <button id=\"confirm-cancel\" class=\"btn btn-block btn-danger\">Confirm</button>\n" +
+                    "</div>";
+                formbody.dispatchEvent(classCancelEvent);
+                $('#genericModal').modal();
+            });
+        });
+
+        addassBtns.forEach(function (addassBtn) {
+            addassBtn.addEventListener('click',function (event) {
+                event.preventDefault();
+                var origin = event.target;
+                ass_classID = origin.getAttribute('data-classid');
+                var req = new XMLHttpRequest();
+                req.open('GET',"{% url 'courseapp:ajax_addassignment' course.code %}",true);
+                req.setRequestHeader('classID',ass_classID);
+                req.addEventListener('load',function (ev) {
+                    modalheading.innerHTML = 'New Assignment';
+                    formbody.innerHTML = this.responseText;
+                    formbody.dispatchEvent(assignmentCreationEvent);
+                    $('#genericModal').modal();   // Looks like this works only with jQuery not with pure JS.
+                });
+                req.send();
+            })
+        });
+
+        addhandBtns.forEach(function (addhandBtn) {
+            addhandBtn.addEventListener('click',function (event) {
+                event.preventDefault();
+                var origin = event.target;
+                hand_classID = origin.getAttribute('data-classid');
+                var req = new XMLHttpRequest();
+                req.open('GET',"{% url 'courseapp:ajax_addhandout' course.code %}",true);
+                req.setRequestHeader('classID',hand_classID);
+                req.addEventListener('load',function (ev) {
+                    modalheading.innerHTML = 'New Handout';
+                    formbody.innerHTML = this.responseText;
+                    formbody.dispatchEvent(handoutCreationEvent);
+                    $('#genericModal').modal();   // Looks like this works only with jQuery not with pure JS.
+                });
+                req.send();
+            })
+        });
+
+        addtestBtns.forEach(function (addtestBtn) {
+            addtestBtn.addEventListener('click',function (event) {
+                event.preventDefault();
+                var origin = event.target;
+                test_classID = origin.getAttribute('data-classid');
+                var req = new XMLHttpRequest();
+                req.open('GET',"{% url 'courseapp:ajax_addtest' course.code %}",true);
+                req.setRequestHeader('classID',test_classID);
+                req.addEventListener('load',function (ev) {
+                    modalheading.innerHTML = 'New Test';
+                    formbody.innerHTML = this.responseText;
+                    formbody.dispatchEvent(testCreationEvent);
+                    $('#genericModal').modal();   // Looks like this works only with jQuery not with pure JS.
+                });
+                req.send();
+            })
+        });
+
+
+    </script>
+{% endblock %}

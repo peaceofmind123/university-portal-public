@@ -1,0 +1,192 @@
+{% extends 'adminapp/adminbase.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="col-md-12 page-header">
+        <h3>Student Profiler</h3>
+    </div>
+    <div class="row">
+    <div class="col-md-12">
+       <form class="form" method="POST">
+        {% csrf_token %}
+        <div class="col-md-7 form-group row">
+       <div class="form-group input-group">
+        <input type="text" class="form-control" id="rollno" name="rollno" placeholder="Enter Roll Number : 2072BCT500">
+        <span class="input-group-btn">
+            <button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
+        </span>
+       </div>
+            </div>
+    </form>
+    </div>
+    <div class="col-md-12">
+        <div class="panel panel-primary">
+            <div class="panel-body">
+                <div class="col-md-3"><img src="{% static student.profilepic.url %}" align="center" width="100%" alt="Student Picture">  </div>
+                <div class="col-md-9">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>{{ student.get_full_name }}</td>
+                            </tr>
+                            <tr>
+                                <td>E-mail</td>
+                                <td>{{ student.email }}</td>
+                            </tr>
+                            <tr>
+                                <td>Stream</td>
+                                <td>{{ student.stream }}</td>
+                            </tr>
+                            <tr>
+                                <td>Batch</td>
+                                <td>{{ student.batch }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="panel panel-info">
+            <div class="panel-heading">Performance Analysis on different courses</div>
+            <div class="panel-body">
+                <div class="col-md-10">
+                    <div id="morris-line-chart-performance"></div>
+                </div>
+                <div class="col-md-2 center-block">
+                    <ul class="list-group">
+                        <li class="list-group-item"><i class="fa fa-square" style="color: skyblue"></i> Course 1</li>
+                        <li class="list-group-item"><i class="fa fa-square" style="color: grey"></i> Course 2</li>
+                        <li class="list-group-item"><i class="fa fa-square" style="color: orange"></i> Course 3</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">Assignments Info</div>
+            <div class="panel-body">
+                <div class="col-md-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading text-center"> Course 1 </div>
+                    <div class="panel-body">
+                        <div id="morris-donut-chart-course1"></div>
+                    </div>
+                </div>
+                </div>
+                <div class="col-md-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading text-center"> Course 2 </div>
+                    <div class="panel-body">
+                        <div id="morris-donut-chart-course2"></div>
+                    </div>
+                </div>
+                </div>
+                <div class="col-md-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading text-center"> Course 3 </div>
+                    <div class="panel-body">
+                        <div id="morris-donut-chart-course3"></div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+    <div class="panel panel-success">
+        <div class="panel-heading"> Project List </div>
+        <div class="panel-body">
+            <table width="100%" class="table table-striped table-bordered table-hover" id="teacher-table">
+            <thead>
+                <tr>
+                    <th>S.N</th>
+                    <th>Name Of Project</th>
+                    <th>Project Category</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="odd gradeX">
+                    <td>1</td>
+                    <td>University Portal</td>
+                    <td>Health and Education</td>
+                    <td>Excellent </td>
+                </tr>
+                <tr class="odd gradeX">
+                    <td>2</td>
+                    <td>Junior meets Senior</td>
+                    <td>Health and Education</td>
+                    <td>Poor </td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+    </div>
+{% endblock %}
+
+{% block extrajs %}
+    <script>
+    $(function() {
+
+	Morris.Line({
+  element: 'morris-line-chart-performance',
+  data: [
+    { y: '2018 Q1', a: 10,  b: 12, c:19 },
+    { y: '2018 Q2', a: 15,  b: 13, c:12 },
+    { y: '2018 Q3', a: 15,  b: 10, c:9 },
+    { y: '2018 Q4', a: 20,  b: 18, c:12 }
+  ],
+  xkey: 'y',
+  ykeys: ['a', 'b','c'],
+  labels: ['Course 1', 'Course 2','Course 3'],
+    ymin : 6,
+    lineColors : ['skyblue','grey','orange']
+	});
+
+	Morris.Donut({
+        element: 'morris-donut-chart-course1',
+        data: [{
+            label: "Submitted",
+            value: 7
+        }, {
+            label: "Not Submitted",
+            value: 1
+        }],
+        resize: true,
+        colors : ['grey','brown']
+    });
+
+	Morris.Donut({
+        element: 'morris-donut-chart-course2',
+        data: [{
+            label: "Submitted",
+            value: 4
+        }, {
+            label: "Not-Submitted",
+            value: 2
+        }],
+        resize: true,
+        colors : ['#DDD','wood']
+    });
+	Morris.Donut({
+        element: 'morris-donut-chart-course3',
+        data: [{
+            label: "Submitted",
+            value: 10
+        }, {
+            label: "Not-Submitted",
+            value: 1
+        }],
+        resize: true
+    });
+
+
+});
+    </script>
+{% endblock %}

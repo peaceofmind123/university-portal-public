@@ -1,0 +1,67 @@
+{% extends 'adminapp/adminbase.html' %}
+{% load widget_tweaks %}
+
+{% block extracss %}
+    <style>
+        form ul{
+            list-style-type: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class=" page-header col-md-12">
+            <h3>New Admission</h3>
+        </div>
+        <div class="col-md-12">
+            <p class="alert alert-info text-muted">The following information is needed to create a new batch of students to be registered
+                into the portal. The admission of new batch also means that the records 4th year students will be deleted from the
+                portal.
+            </p>
+        </div>
+        <div class="col-md-12">
+            <div class="jumbotron" style="padding: 2%;">
+            <form method="POST" novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p {% if forloop.last %}class="mb-0" {% endif %}>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="form-group">
+                        {{ field.label_tag}}
+                        {% if field.name == 'streams' %}
+                            {% render_field field %}
+                        {% else %}
+                            {% if form.is_bound %}
+                                {% if field.errors %}
+                                    {% render_field field class='form-control panel-danger' %}
+                                    {% for error in field.errors %}
+                                    <div class="text-danger">
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    {% render_field field class='form-control panel-success' %}
+                                {% endif %}
+                            {% else %}
+                                {% render_field field class='form-control' %}
+                            {% endif %}
+                        {% endif %}
+                        {% if field.help_text %}
+                            <span class="text-muted "><small>{{ field.help_text|safe }}</small></span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-success">Proceed</button>
+                <a href="{% url 'adminapp:addbatch' %}" class="btn btn-danger">Cancel</a>
+            </form>
+        </div>
+        </div>
+    </div>
+{% endblock %}

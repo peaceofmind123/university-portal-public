@@ -1,0 +1,188 @@
+{% extends 'adminapp/adminbase.html' %}
+
+{% block extracss %}
+<style xmlns="http://www.w3.org/1999/html">
+    #listofstudents {
+    }
+    #addbatch {
+        margin-top: 4%;
+    }
+    #addindividual {
+        margin-top: 4%;
+    }
+    form {
+        margin-top: 2%;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="col-md-8">
+                <form id="inlineform" class="form form-inline" method="POST">
+                    {% csrf_token %}
+                    <label for="batch">Batch:</label>
+                    <select class="form-control" id="batch" name="batch">
+                        {% for batch in batches %}
+                            <option value="{{ batch.batch_id }}" {% if selection.batch == batch.batch_id %}selected{% endif %}>
+                                {{ batch.batch_id }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <label for="stream">Stream:</label>
+                    <select class="form-control" id="stream" name="stream">
+                        {% for stream in streams %}
+                            <option value="{{ stream.stream_id }}" {% if selection.stream == stream.stream_id %}selected{% endif %}>
+                                {{ stream.stream_id }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Show</button>
+                </form>
+            </div>
+            {% if not error %}
+            <div class="col-md-4">
+                <button id="addindividual" data-toggle="modal" data-target="#addIndividualModal" class="btn btn-block btn-success ">
+                    <span class="glyphicon glyphicon-pencil"></span> Add New Student in {{ selection.batch }}{{ selection.stream }}
+                </button>
+            </div>
+            {% endif %}
+        </div>
+        {%  if not error %}
+            <!---Add Individual Modal --->
+            <div class="modal" id="addIndividualModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <span id="modal-close" class="close" >&times</span>
+                            <div class="modal-title"><h3 class="info">New Student Admission</h3></div>
+                        </div>
+                        <div id="formbody" class="modal-body">
+                            <!-- Django Individual Student Addition Form -->
+                            {% include 'formbase.html' with returnURL='adminapp:studentlist' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <div class="row">
+            <div id="listofstudents" class="container col-md-12">
+                <h3><small>Students who have signed up to the portal:</small></h3>
+                {% if not studentlist %}
+                    <div class="alert alert-danger">
+                        <p> No students of the selected batch and stream have signed up !</p>
+                    </div>
+                {% else %}
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="student-table">
+                        <thead>
+                            <tr>
+                                <th>Roll Number</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in studentlist %}
+                                <tr class="odd gradeX">
+                                    <td>{{ student.rollno }}</td>
+                                    <td>{{ student.first_name }} {{ student.last_name }}</td>
+                                    <td>{{ student.email }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div id="listofunsigned" class="container col-md-12">
+                <h3><small>Students yet to sign up to the portal:</small></h3>
+                {% if not unsignedlist %}
+                    <div class="alert alert-success">
+                        <p> All students of the selected batch and stream who have been registered have signed up !</p>
+                    </div>
+                {% else %}
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="student-table">
+                        <thead>
+                            <tr>
+                                <th>Roll Number</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in unsignedlist %}
+                                <tr class="odd gradeX">
+                                    <td>{{ student.rollno }}</td>
+                                    <td>{{ student.first_name }} {{ student.last_name }}</td>
+                                    <td>{{ student.email }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+            </div>
+        </div>
+        {% else %}
+        <div class="row">
+            <div class="col-md-12 alert alert-danger" style="margin-top: 10%;">
+                <h3><strong>{{ error.code }} :</strong></h3>
+                <p>{{ error.message }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}
+{% block extrajs %}
+    <script>
+    //script to submit the student creation form asynchronously
+        var formbody = document.querySelector('#formbody');
+        var refreshEvent = new Event('refresh');
+
+        formbody.addEventListener('refresh',function (event) {
+
+            var batchSelect = document.querySelector('#id_batch');
+            batchSelect.childNodes.forEach(function (option) {
+                if(option.tagName === 'OPTION'){
+                    if(!option.selected){
+                        option.setAttribute('disabled','disabled');
+                    }
+                }
+            });
+            var streamSelect = document.querySelector('#id_stream');
+            streamSelect.childNodes.forEach(function (option) {
+                if(option.tagName === 'OPTION'){
+                    if(!option.selected){
+                        option.setAttribute('disabled','disabled');
+                    }
+                }
+            });
+            var form = document.querySelector('#formbase-form');
+            form.addEventListener('submit',function (e) {
+                var formdata = new FormData(form);
+                var req = new XMLHttpRequest();
+                req.open('POST',"{% url 'adminapp:ajax_addstudent' %}",true);
+                req.addEventListener('load',function (ev) {
+                    console.log(this.responseText);
+                    formbody.innerHTML = this.responseText;
+                    formbody.dispatchEvent(refreshEvent);
+                });
+                req.send(formdata);
+                e.preventDefault();
+            });
+            // Below is done so that when modal is closed we load the list of specific batch and streams, not always the default one
+            var modalClose = document.querySelector('#modal-close');
+            modalClose.addEventListener('click',function (event) {
+                var inlineForm = document.querySelector('#inlineform');
+                inlineForm.submit();
+            });
+        });
+
+        formbody.dispatchEvent(refreshEvent);
+
+    </script>
+{% endblock %}

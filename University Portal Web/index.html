@@ -1,0 +1,182 @@
+{% extends 'teacherapp/teacherbase.html' %}
+
+{% block content %}
+    	<div class="row">
+			<div class="col-lg-12">
+				<h1 class="page-header">Dashboard</h1>
+			</div>
+		</div>
+
+		<div class="row">
+		<div class="col-md-12">
+			<div class="panel panel-info">
+				<div class="panel-heading">Course Overview</div>
+				<div class="panel-body">
+                    {% for course in courses %}
+					<div class="col-lg-4">
+					<div class="panel panel-primary">
+						<div class="panel-heading text-center text-capitalize">
+							{{ course.name }}
+						</div>
+						<div class="panel-body">
+							<div class="progress progress-striped active">
+								<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%;">
+									<span>40% Complete</span>
+								</div>
+							</div>
+                            <button type="button" class="btn btn-outline btn-danger text-center center-block">View Detials</button>
+						</div>
+					</div>
+					</div>
+                    {% endfor %}
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div class="row">
+				<div class="col-lg-4">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">
+                            Upcoming Class Dates
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#applied-mechanics" data-toggle="tab">Applied Mechanics</a>
+                                </li>
+                                <li><a href="#geology" data-toggle="tab">Geology</a>
+                                </li>
+                            </ul>
+
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                                <div class="tab-pane fade in active" id="applied-mechanics">
+
+                                    <ul class="list-group">
+                                    	<li class="list-group-item"></li>
+                                    	<li class="list-group-item"></li>
+                                    	<li class="list-group-item"></li>
+                                    </ul>
+                                </div>
+                                <div class="tab-pane fade" id="geology">
+
+                                    <ul class="list-group">
+                                    	<li class="list-group-item"></li>
+                                    	<li class="list-group-item"></li>
+                                    	<li class="list-group-item"></li>
+                                    </ul>
+                                </div>
+                             </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <div class="col-md-4">
+                	<div class="panel panel-info">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Applied Mechanics Assignment
+                        </div>
+                        <div class="panel-body">
+                            <div id="morris-donut-chart-assignment1"></div>
+                            <a href="#" class="btn btn-outline btn-danger btn-block">View Details</a>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+
+                </div>
+                <div class="col-md-4">
+                	<div class="panel panel-info">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Geology Assignment
+                        </div>
+                        <div class="panel-body">
+                            <div id="morris-donut-chart-assignment2"></div>
+                            <a href="#" class="btn btn-outline btn-danger btn-block">View Details</a>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+
+                </div>
+      		</div>
+		<div class="row">
+      			<div class="col-md-6">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<i class="fa fa-bar-chart-o fa-fw"></i> Assignment Analysis
+						</div>
+					<div class="panel-body">
+						<div id="morris-line-chart-assignment"></div>
+					</div>
+					</div>
+      			</div>
+      			<div class="col-md-6">
+      				<div class="panel panel-info">
+						<div class="panel-heading">
+							<i class="fa fa-bar-chart-o fa-fw"></i> Test Analysis
+						</div>
+					<div class="panel-body">
+						<div id="morris-line-chart-test"></div>
+					</div>
+					</div>
+      			</div>
+      		</div>
+{% endblock %}
+
+{% block extrajs %}
+    <script>
+		$(function() {
+			Morris.Donut({
+        element: 'morris-donut-chart-assignment1',
+        data: [{
+            label: "Submitted",
+            value: 30
+        }, {
+            label: "Not Submitted",
+            value: 18
+        }],
+        resize: true
+    });
+			Morris.Donut({
+        element: 'morris-donut-chart-assignment2',
+        data: [{
+            label: "Submitted",
+            value: 20
+        }, {
+            label: "Not Submitted",
+            value: 28
+        }],
+        resize: true
+    });
+
+	Morris.Line({
+  element: 'morris-line-chart-assignment',
+  data: [
+    { y: '2018 W1', a: 48,  b: 48 },
+    { y: '2018 W3', a: 42,  b: 44 },
+    { y: '2018 W5', a: 35,  b: 30 },
+    { y: '2018 W7', a: 27,  b: 38 },
+  ],
+  xkey: 'y',
+  ykeys: ['a', 'b'],
+  labels: ['Applied Mechanics', 'Geology'],
+	});
+	Morris.Line({
+  element: 'morris-line-chart-test',
+  data: [
+    { y: '2018 Q1', a: 14,  b: 13 },
+    { y: '2018 Q2', a: 18,  b: 17 },
+	{ y: '2018 Q3', a: 15,  b: 15 }
+  ],
+  xkey: 'y',
+  ykeys: ['a', 'b'],
+  labels: ['Applied Mechanics', 'Geology'],
+	});
+
+});
+
+
+	</script>
+{% endblock %}

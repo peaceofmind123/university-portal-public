@@ -1,0 +1,176 @@
+{% extends 'teacherapp/teacherbase.html' %}
+
+{% block extranewcss %}
+<style>
+
+    form {
+        margin-top: 2%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12 page-header">
+            <h3>List of students you teach</h3>
+        </div>
+
+    <form class="form form-inline" method="POST">
+        {% csrf_token %}
+        <label for="course">Select the course :</label>
+        <select class="form-control" id="course" name="course">
+            {% for course in courses %}
+                <option value="{{ course.name }}" {% if selection.course == course.name %}selected{% endif %}>
+                    {{ course.name }}
+                </option>
+                <hr>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Show</button>
+    </form>
+
+    <div id="listofstudents" class="container col-md-12">
+        <h3><small>Students are shown categorized into their respective streams:</small></h3>
+        {% for stream in course.level1streams.all %}
+            <div class="col-md-10 col-md-push-1 panel panel-primary">
+                <div class="panel panel-heading">
+                    <span>{{ stream.name }}</span>
+                    <span class="badge pull-right">First Year</span>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                    {% if stream.get_level1students %}
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="student-table">
+                            <thead>
+                                <tr>
+                                    <th>Roll Number</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in stream.get_level1students %}
+                                    <tr class="odd gradeX">
+                                        <td>{{ student.rollno }}</td>
+                                        <td>{{ student.first_name }} {{ student.last_name }}</td>
+                                        <td>{{ student.email }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <h4><em> No students yet in this class</em></h4>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% for stream in course.level2streams.all %}
+            <div class="col-md-10 col-md-push-1 panel panel-yellow">
+                <div class="panel panel-heading">
+                    <span>{{ stream.name }}</span>
+                    <span class="badge pull-right">Second Year</span>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                    {% if stream.get_level2students %}
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="student-table">
+                            <thead>
+                                <tr>
+                                    <th>Roll Number</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in stream.get_level2students %}
+                                    <tr class="odd gradeX">
+                                        <td>{{ student.rollno }}</td>
+                                        <td>{{ student.first_name }} {{ student.last_name }}</td>
+                                        <td>{{ student.email }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <h4><em>No students yet in this class</em></h4>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% for stream in course.level3streams.all %}
+            <div class="col-md-10 col-md-push-1 panel panel-green">
+                <div class="panel panel-heading">
+                    <span>{{ stream.name }}</span>
+                    <span class="badge pull-right">Third Year</span>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                    {% if stream.get_level3students %}
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="student-table">
+                            <thead>
+                                <tr>
+                                    <th>Roll Number</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in stream.get_level3students %}
+                                    <tr class="odd gradeX">
+                                        <td>{{ student.rollno }}</td>
+                                        <td>{{ student.first_name }} {{ student.last_name }}</td>
+                                        <td>{{ student.email }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <h4><em>No students yet in this class</em></h4>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% for stream in course.level4streams.all %}
+            <div class="col-md-10 col-md-push-1 panel panel-red">
+                <div class="panel panel-heading">
+                    <span>{{ stream.name }}</span>
+                    <span class="badge pull-right">Fourth Year</span>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                    {% if stream.get_level4students %}
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="student-table">
+                            <thead>
+                                <tr>
+                                    <th>Roll Number</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in stream.get_level4students %}
+                                    <tr class="odd gradeX">
+                                        <td>{{ student.rollno }}</td>
+                                        <td>{{ student.first_name }} {{ student.last_name }}</td>
+                                        <td>{{ student.email }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <h4><em>No students yet in this class</em></h4>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+</div>
+{% endblock %}

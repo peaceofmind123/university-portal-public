@@ -1,0 +1,78 @@
+{% extends 'courseapp/coursebase.html' %}
+{% load static %}
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header text-capitalize">List of Submissions</h2>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="row">
+            <div id="listofstudents" class="container col-md-12">
+                <h3><small>Students who have submitted the assignments :</small></h3>
+                {% if not submissions %}
+                    <div class="alert alert-danger">
+                        <p> No students have submitted the assignment yet !</p>
+                    </div>
+                {% else %}
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="student-table">
+                        <thead>
+                            <tr>
+                                <th>Roll Number</th>
+                                <th>Name</th>
+                                <th>Submission Date</th>
+                                <th>Submitted Document</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for submission in submissions %}
+                                <tr class="odd gradeX">
+                                    <td>{{ submission.data.student.rollno }}</td>
+                                    <td>{{ submission.data.student.first_name }} {{ submission.data.student.last_name }}</td>
+                                    <td>{{ submission.data.submission_date }}</td>
+                                    <td><a href="{% static submission.data.answer_file.url %}" target="_blank" class="btn btn-primary btn-block">Download File</a></td>
+                                    <td class="text-danger">{{ submission.remarks }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div id="listofremaining" class="container col-md-12">
+                <h3><small>Students who haven't submitted the assignment :</small></h3>
+                {% if not remaining_students %}
+                    <div class="alert alert-success">
+                        <p> All students of this course have submitted the assignment !</p>
+                    </div>
+                {% else %}
+                    <table width="100%" class="table table-striped table-bordered table-hover" id="student-table">
+                        <thead>
+                            <tr>
+                                <th>Roll Number</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in remaining_students %}
+                                <tr class="odd gradeX">
+                                    <td>{{ student.rollno }}</td>
+                                    <td>{{ student.first_name }} {{ student.last_name }}</td>
+                                    <td>{{ student.email }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
