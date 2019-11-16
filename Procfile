@@ -1,0 +1,1 @@
+web: gunicorn university-portal-public.wsgi
