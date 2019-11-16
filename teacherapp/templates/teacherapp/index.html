@@ -1,0 +1,235 @@
+{% extends 'teacherapp/teacherbase.html' %}
+
+{% block content %}
+
+		<div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-info">
+                    <div class="panel-heading">Course Overview</div>
+                    <div class="panel-body">
+                        {% for course in courses %}
+                        <div class="col-lg-4">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading text-center text-capitalize">
+                                {{ course.data.name }}
+                            </div>
+                            <div class="panel-body">
+                                <div class="progress progress-striped active">
+                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ course.data.get_completion_percent }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ course.data.get_completion_percent }}%;">
+                                        <span>{{ course.data.get_completion_percent }}% Complete</span>
+                                    </div>
+                                </div>
+                                <a href="{% url 'courseapp:courseplan' course.data.code %}" class="btn btn-outline btn-danger text-center center-block">View Details</a>
+                            </div>
+                        </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+		<div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        Upcoming Class Dates
+                    </div>
+                    <!-- /.panel-heading -->
+                    <div class="panel-body">
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs">
+                            {% for course in courses %}
+                                <li {% if forloop.first %}class="active"{% endif %}><a href="#date{{ course.data.code }}" data-toggle="tab">{{ course.data.name }}</a>
+                                </li>
+                            {% endfor %}
+
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            {% for course in courses %}
+                                <div class="tab-pane fade in {% if forloop.first %}active{% endif %}" id="date{{ course.data.code }}">
+                                    <ul class="list-group">
+                                        {% if course.remaining_classdates %}
+                                            {% for classdate in course.remaining_classdates %}
+                                                <li class="list-group-item">{{ classdate }}</li>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p><em>No remaining classes for this courses</em></p>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            {% endfor %}
+                         </div>
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+            </div>
+            <div class="col-md-8">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <i class="fa fa-bar-chart-o fa-fw"></i> Assignment vs Submissions analysis
+                    </div>
+                    <div class="panel-body">
+                        <ul class="nav nav-tabs">
+                            {% for course in courses %}
+
+                                <li {% if forloop.first %}class="active"{% endif %}>
+                                    <a href="#ass{{ course.data.code }}" data-identifier="{{ course.data.code }}" data-toggle="tab">
+                                        {{ course.data.name }}
+                                    </a>
+                                </li>
+
+                            {% endfor %}
+                        </ul>
+                        <div class="tab-content">
+                            {% for course in courses %}
+                                {% if course.data.get_assignments %}
+                                    <div id="ass{{ course.data.code }}" class="tab-pane fade in {% if forloop.first %}active{% endif %}">
+                                        <div id="asschart{{ course.data.code }}"></div>
+                                    </div>
+                                {% else %}
+                                    <div id="ass{{ course.data.code }}" class="tab-pane fade in {% if forloop.first %}active{% endif %}">
+                                        <p class="alert alert-danger">No assignments given yet</p>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    Tests Summary
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        {% for course in courses %}
+                            {% for test in course.completed_tests %}
+                                <div class="col-md-4">
+                                    <div class="panel panel-info">
+                                        <div class="panel-heading">
+                                            <i class="fa fa-bar-chart-o fa-fw"></i>{{ test.name }}
+                                        </div>
+                                        <div class="panel-body">
+                                            <div id="testdonut-{{ test.test_id }}"></div>
+                                            <a href="{% url 'courseapp:result' course.data.code test.test_id %}" class="btn btn-outline btn-danger btn-block">View Details</a>
+                                        </div>
+                                        <!-- /.panel-body -->
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+		<div class="col-md-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> Average marks on Tests
+                </div>
+                <div class="panel-body">
+                    <ul class="nav nav-tabs">
+                        {% for course in courses %}
+
+                            <li {% if forloop.first %}class="active"{% endif %}>
+                                <a href="#test{{ course.data.code }}" data-identifier="testline{{ course.data.code }}" data-toggle="tab">
+                                    {{ course.data.name }}
+                                </a>
+                            </li>
+
+                        {% endfor %}
+                    </ul>
+                    <div class="tab-content">
+                        {% for course in courses %}
+                            {% if course.tests %}
+                                <div id="test{{ course.data.code }}" class="tab-pane fade in {% if forloop.first %}active{% endif %}">
+                                    <div id="testchart-{{ course.data.code }}"></div>
+                                </div>
+                            {% else %}
+                                <div id="test{{ course.data.code }}" class="tab-pane fade in {% if forloop.first %}active{% endif %}">
+                                    <p class="alert alert-danger">No tests yet</p>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+{% endblock %}
+
+{% block extrajs %}
+    <script>
+        {% for course in courses %}
+            {% if course.data.get_assignments %}
+                var {{ course.data.code }} = Morris.Bar({
+                element: 'asschart{{ course.data.code }}',
+                data: {{ course.assignments|safe }},
+                xkey: 'y',
+                ykeys: ['a'],
+                labels: ['{{ course.data.name }}']
+            });
+            {% endif %}
+        {% endfor %}
+
+        {% for course in courses %}
+            {% for test in course.completed_tests %}
+                var testdonut{{ test.get_id }} = Morris.Donut({
+                element: 'testdonut-{{ test.test_id }}',
+                data:[{
+                    label: "Passed",
+                    value: {{ test.get_passed_count }}
+                }, {
+                    label: "Failed",
+                    value: {{ test.get_failed_count }}
+                }],
+                resize: true,
+                colors: ['green','brown']
+            });
+            {% endfor %}
+        {% endfor %}
+
+        {% for course in courses %}
+            {% if course.tests %}
+                var testline{{ course.data.code }} = Morris.Line({
+                element: 'testchart-{{ course.data.code }}',
+                data: {{ course.tests|safe }},
+                xkey: 'y',
+                ykeys: ['a'],
+                labels: ['{{ course.data.name }}']
+            });
+            {% endif %}
+        {% endfor %}
+
+        $('ul.nav a').on('shown.bs.tab',function (e) {
+            var toggledata = $(this).attr("data-identifier");
+            console.log(toggledata);
+            eval(toggledata+'.redraw()');
+
+        });
+		$(function() {
+            {% for course in courses %}
+                {{ course.data.code }}.redraw();
+            {% endfor %}
+
+            {% for course in courses %}
+                {% for test in course.completed_tests %}
+                    testdonut{{ test.get_id }}.redraw();
+                {% endfor %}
+            {% endfor %}
+
+            {% for course in courses %}
+                testline{{ course.data.code }}.redraw();
+            {% endfor %}
+        });
+
+	</script>
+{% endblock %}
